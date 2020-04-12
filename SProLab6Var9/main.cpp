@@ -105,6 +105,54 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             break;
         }
+        case WM_COMMAND:
+        {
+            auto menuOptionId = (MenuOptionId)LOWORD(wParam);
+
+            switch (menuOptionId)
+            {
+                case MenuOptionId::FILE_CREATE:
+                {
+                    char fileName[MAX_PATH] = "";
+                    OPENFILENAME openFileName{};
+                    openFileName.lStructSize = sizeof(openFileName);
+                    openFileName.hwndOwner = hWnd;
+                    openFileName.hInstance = hInst;
+                    openFileName.lpstrFilter = "New File\0\0";
+                    openFileName.lpstrFile = fileName;
+                    openFileName.nMaxFile = MAX_PATH;
+                    openFileName.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+                    openFileName.lpstrDefExt = "txt";
+
+                choose_file:
+                    BOOL wasFileChosen = GetSaveFileName(&openFileName);
+                    if (!wasFileChosen)
+                    {
+                        break;
+                    }
+
+                    WIN32_FIND_DATA findData{};
+                    auto doesFileAlreadyExist = FindFirstFile(fileName, &findData) != INVALID_HANDLE_VALUE;
+                    if (doesFileAlreadyExist)
+                    {
+                        MessageBox(hWnd, "File already exists", "Error", MB_OK);
+                        goto choose_file;
+                    }
+
+                    auto createdFile = CreateFile(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+                    if (createdFile == INVALID_HANDLE_VALUE)
+                    {
+                        MessageBox(hWnd, "Failed to create file", "Error", MB_OK);
+                        break;
+                    }
+
+                    CloseHandle(createdFile);
+
+                    break;
+                }
+            }
+            break;
+        }
         case WM_DESTROY:
             PostQuitMessage(0);
             break;
