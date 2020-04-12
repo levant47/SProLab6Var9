@@ -8,6 +8,14 @@ ATOM MyRegisterClass(HINSTANCE hInstance);
 BOOL InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
+enum MenuOptionId
+{
+    FILE_CREATE = 1,
+    FILE_DELETE = 2,
+    FILE_READ = 3,
+    FILE_COPY = 4,
+};
+
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     MSG msg;
@@ -67,8 +75,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
         case WM_CREATE:
+        {
+            HMENU hMenubar;
+            HMENU hMenu;
+
+            hMenubar = CreateMenu();
+            hMenu = CreateMenu();
+
+            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_CREATE, "Створити файл");
+            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_DELETE, "Видалити файли");
+            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_READ, "Прочитати файл");
+            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_COPY, "Копiювати файли");
+
+            AppendMenu(hMenubar, MF_POPUP, (UINT_PTR)hMenu, "File");
+            SetMenu(hWnd, hMenubar);
+
             break;
+        }
         case WM_PAINT:
+        {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
 
@@ -79,6 +104,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
 
             break;
+        }
         case WM_DESTROY:
             PostQuitMessage(0);
             break;
