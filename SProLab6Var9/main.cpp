@@ -6,6 +6,9 @@
 HINSTANCE hInst;
 LPCTSTR szWindowClass = "WindowClass";
 LPCTSTR szTitle = "Title";
+HWND fileContentsTextBox;
+char *fileContentBuffer = NULL;
+int fileSize = 0;
 
 ATOM MyRegisterClass(HINSTANCE hInstance);
 BOOL InitInstance(HINSTANCE, int);
@@ -105,18 +108,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             AppendMenu(hMenubar, MF_POPUP, (UINT_PTR)hMenu, "File");
             SetMenu(hWnd, hMenubar);
 
-            break;
-        }
-        case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-
-            RECT clientRect;
-            GetClientRect(hWnd, &clientRect);
-            DrawText(hdc, "Привіт, світ!", -1, &clientRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-
-            EndPaint(hWnd, &ps);
+            fileContentsTextBox = CreateWindowEx(
+                NULL,
+                "EDIT",
+                NULL,
+                WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN,
+                0, 35, 0, 0,
+                hWnd,
+                NULL,
+                (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
+                NULL);
 
             break;
         }
@@ -207,7 +208,54 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                     break;
                 }
+                case MenuOptionId::FILE_READ:
+                {
+                    char fileName[MAX_PATH]{0};
+
+                    OPENFILENAME openFileName{};
+                    openFileName.lStructSize = sizeof(openFileName);
+                    openFileName.hwndOwner = hWnd;
+                    openFileName.hInstance = hInst;
+                    openFileName.lpstrFilter = "Text Files\0*.txt\0\0";
+                    openFileName.lpstrFile = fileName;
+                    openFileName.nMaxFile = MAX_PATH;
+                    openFileName.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+                    openFileName.lpstrDefExt = "txt";
+
+                    BOOL wasFileChosen = GetOpenFileName(&openFileName);
+                    if (!wasFileChosen)
+                    {
+                        break;
+                    }
+
+                    OFSTRUCT of;
+                    auto targetFile = CreateFile(openFileName.lpstrFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+                    fileSize = GetFileSize(targetFile, NULL);
+                    if (fileContentBuffer != NULL)
+                    {
+                        delete[] fileContentBuffer;
+                    }
+                    fileContentBuffer = new char[fileSize + 1]{0};
+                    DWORD bytesRead;
+                    BOOL wasReadingSuccessful = ReadFile(targetFile, fileContentBuffer, fileSize, &bytesRead, NULL);
+                    if (!wasReadingSuccessful)
+                    {
+                        MessageBox(hWnd, "Failed to read file", "Read File", MB_OK);
+                        break;
+                    }
+
+                    CloseHandle(targetFile);
+
+                    SetWindowText(fileContentsTextBox, fileContentBuffer);
+
+                    break;
+                }
             }
+            break;
+        }
+        case WM_SIZE:
+        {
+            MoveWindow(fileContentsTextBox, 0, 0, LOWORD(lParam), HIWORD(lParam), TRUE);
             break;
         }
         case WM_DESTROY:
