@@ -103,7 +103,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_CREATE, "Створити файл");
             AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_DELETE, "Видалити файли");
             AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_READ, "Прочитати файл");
-            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_COPY, "Копiювати файли");
+            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_COPY, "Копiювати текст");
 
             AppendMenu(hMenubar, MF_POPUP, (UINT_PTR)hMenu, "File");
             SetMenu(hWnd, hMenubar);
@@ -247,6 +247,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     CloseHandle(targetFile);
 
                     SetWindowText(fileContentsTextBox, fileContentBuffer);
+
+                    break;
+                }
+                case MenuOptionId::FILE_COPY:
+                {
+                    if (fileContentBuffer == NULL)
+                    {
+                        MessageBox(hWnd, "No file is opened", "Error", MB_OK);
+                        break;
+                    }
+
+                    char currentDirectoryPath[MAX_PATH]{0};
+                    GetModuleFileName(NULL, currentDirectoryPath, MAX_PATH);
+                    char targetFilePath[MAX_PATH];
+                    sprintf(targetFilePath, "%s\\..\\Readme.txt\0", currentDirectoryPath);
+                    auto targetFile = CreateFile(targetFilePath, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+                    DWORD bytesWritten;
+                    BOOL wasWritingSuccessful = WriteFile(targetFile, fileContentBuffer, fileSize, &bytesWritten, NULL);
+                    if (!wasWritingSuccessful)
+                    {
+                        MessageBox(hWnd, "Failed to write file", "Error", MB_OK);
+                        break;
+                    }
+
+                    CloseHandle(targetFile);
+
+                    MessageBox(hWnd, "Success", "Success", MB_OK);
 
                     break;
                 }
