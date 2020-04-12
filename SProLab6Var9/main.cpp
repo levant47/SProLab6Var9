@@ -1,3 +1,6 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <ShlObj_core.h>
+#include <stdio.h>
 #include <windows.h>
 
 HINSTANCE hInst;
@@ -67,6 +70,18 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
     return TRUE;
+}
+
+INT CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lp, LPARAM pData)
+{
+    if (uMsg == BFFM_INITIALIZED)
+    {
+        char currentDirectoryPath[MAX_PATH];
+        GetCurrentDirectory(MAX_PATH, currentDirectoryPath);
+        SendMessage(hwnd, BFFM_SETSELECTION, TRUE, (LPARAM)currentDirectoryPath);
+    }
+
+    return 0;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -147,6 +162,48 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     }
 
                     CloseHandle(createdFile);
+
+                    break;
+                }
+                case MenuOptionId::FILE_DELETE:
+                {
+                    TCHAR selectedDirectoryPath[MAX_PATH];
+
+                    BROWSEINFO browseInfo{};
+                    browseInfo.lpszTitle = ("Browse for folder...");
+                    browseInfo.lpfn = BrowseCallbackProc;
+
+                    LPITEMIDLIST selectedDirectory = SHBrowseForFolder(&browseInfo);
+
+                    if (selectedDirectory == 0)
+                    {
+                        break;
+                    }
+
+                    SHGetPathFromIDList(selectedDirectory, selectedDirectoryPath);
+
+                    IMalloc *imalloc = 0;
+                    if (SUCCEEDED(SHGetMalloc(&imalloc)))
+                    {
+                        imalloc->Free(selectedDirectory);
+                        imalloc->Release();
+                    }
+
+                    char pattern[MAX_PATH] = {0};
+                    sprintf(pattern, "%s\\*\0\0", selectedDirectoryPath);
+
+                    SHFILEOPSTRUCTA fileOp{};
+                    fileOp.hwnd = hWnd;
+                    fileOp.wFunc = FO_DELETE;
+                    fileOp.pFrom = pattern;
+                    fileOp.pTo = NULL;
+
+                    int resultCode = SHFileOperationA(&fileOp);
+                    if (resultCode != 0)
+                    {
+                        MessageBox(hWnd, "Failed to delete files", "Error", MB_OK);
+                        break;
+                    }
 
                     break;
                 }
