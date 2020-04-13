@@ -100,10 +100,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hMenubar = CreateMenu();
             hMenu = CreateMenu();
 
-            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_CREATE, "Створити файл");
-            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_DELETE, "Видалити файли");
-            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_READ, "Прочитати файл");
-            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_COPY, "Копiювати текст");
+            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_CREATE, "їїїїїїїї їїїї");
+            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_DELETE, "їїїїїїїї їїїїї");
+            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_READ, "їїїїїїїїї їїїї");
+            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_COPY, "їїїiїїїїї їїїїї");
 
             AppendMenu(hMenubar, MF_POPUP, (UINT_PTR)hMenu, "File");
             SetMenu(hWnd, hMenubar);
