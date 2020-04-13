@@ -1,5 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include <ShlObj_core.h>
+#include <ShlObj.h>
 #include <stdio.h>
 #include <windows.h>
 
