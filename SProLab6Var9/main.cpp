@@ -7,7 +7,7 @@ HINSTANCE hInst;
 LPCTSTR szWindowClass = "WindowClass";
 LPCTSTR szTitle = "Title";
 HWND fileContentsTextBox;
-char *fileContentBuffer = NULL;
+wchar_t *fileContentBuffer = NULL;
 int fileSize = 0;
 
 ATOM MyRegisterClass(HINSTANCE hInstance);
@@ -235,7 +235,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     {
                         delete[] fileContentBuffer;
                     }
-                    fileContentBuffer = new char[fileSize + 1]{0};
+                    fileContentBuffer = new wchar_t[fileSize + 1]{0};
                     DWORD bytesRead;
                     BOOL wasReadingSuccessful = ReadFile(targetFile, fileContentBuffer, fileSize, &bytesRead, NULL);
                     if (!wasReadingSuccessful)
@@ -246,7 +246,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                     CloseHandle(targetFile);
 
-                    SetWindowText(fileContentsTextBox, fileContentBuffer);
+                    SetWindowTextW(fileContentsTextBox, fileContentBuffer);
 
                     break;
                 }
