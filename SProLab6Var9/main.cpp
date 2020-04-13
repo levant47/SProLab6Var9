@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+ï»¿#define _CRT_SECURE_NO_WARNINGS
 #include <ShlObj.h>
 #include <stdio.h>
 #include <windows.h>
@@ -100,10 +100,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hMenubar = CreateMenu();
             hMenu = CreateMenu();
 
-            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_CREATE, "¿¿¿¿¿¿¿¿ ¿¿¿¿");
-            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_DELETE, "¿¿¿¿¿¿¿¿ ¿¿¿¿¿");
-            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_READ, "¿¿¿¿¿¿¿¿¿ ¿¿¿¿");
-            AppendMenu(hMenu, MF_STRING, MenuOptionId::FILE_COPY, "¿¿¿i¿¿¿¿¿ ¿¿¿¿¿");
+            AppendMenuW(hMenu, MF_STRING, MenuOptionId::FILE_CREATE, L"Ğ¡Ñ‚Ğ²Ğ¾Ñ€Ğ¸Ñ‚Ğ¸ Ñ„Ğ°Ğ¹Ğ»");
+            AppendMenuW(hMenu, MF_STRING, MenuOptionId::FILE_DELETE, L"Ğ’Ğ¸Ğ´Ğ°Ğ»Ğ¸Ñ‚Ğ¸ Ñ„Ğ°Ğ¹Ğ»Ğ¸");
+            AppendMenuW(hMenu, MF_STRING, MenuOptionId::FILE_READ, L"ĞŸÑ€Ğ¾Ñ‡Ğ¸Ñ‚Ğ°Ñ‚Ğ¸ Ñ„Ğ°Ğ¹Ğ»");
+            AppendMenuW(hMenu, MF_STRING, MenuOptionId::FILE_COPY, L"ĞšĞ¾Ğ¿Ñ–ÑĞ²Ğ°Ñ‚Ğ¸ Ñ‚ĞµĞºÑÑ‚");
 
             AppendMenu(hMenubar, MF_POPUP, (UINT_PTR)hMenu, "File");
             SetMenu(hWnd, hMenubar);
